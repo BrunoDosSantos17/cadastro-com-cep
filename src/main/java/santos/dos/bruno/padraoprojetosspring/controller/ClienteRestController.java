@@ -3,6 +3,8 @@ package santos.dos.bruno.padraoprojetosspring.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import santos.dos.bruno.padraoprojetosspring.exception.CepInvaliteException;
+import santos.dos.bruno.padraoprojetosspring.exception.IdInvaliteException;
 import santos.dos.bruno.padraoprojetosspring.model.Cliente;
 import santos.dos.bruno.padraoprojetosspring.service.ClienteService;
 
@@ -20,25 +22,44 @@ public class ClienteRestController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Cliente> buscarId(@PathVariable Long id){
-        return ResponseEntity.ok(clienteService.buscarPorId(id));
+        try{
+            return ResponseEntity.ok(clienteService.buscarPorId(id));
+        }catch (IdInvaliteException ex){
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @PostMapping
     public ResponseEntity<Cliente> inserir(@RequestBody Cliente cliente){
-        clienteService.inserir(cliente);
-        return ResponseEntity.ok(cliente);
+        try {
+            clienteService.inserir(cliente);
+            return ResponseEntity.ok(cliente);
+        }catch (CepInvaliteException ex){
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @PutMapping("/{id}")
     public ResponseEntity <Cliente> atualizar(@PathVariable Long id, @RequestBody Cliente cliente){
-        clienteService.atualizar(id, cliente);
-        return ResponseEntity.ok(cliente);
+        try {
+            clienteService.atualizar(id, cliente);
+            return ResponseEntity.ok(cliente);
+        }catch (CepInvaliteException | IdInvaliteException ex){
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity <Cliente> deletar(@PathVariable Long id){
-        clienteService.deletar(id);
-        return ResponseEntity.ok().build();
+        try {
+            clienteService.deletar(id);
+            return ResponseEntity.ok().build();
+        }catch (IdInvaliteException exceptionId){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 }
